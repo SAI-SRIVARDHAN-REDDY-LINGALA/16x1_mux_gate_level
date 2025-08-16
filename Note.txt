@@ -1,0 +1,56 @@
+Got it 👍 Let me rewrite your rule clearly and neatly so you don’t get confused again:
+
+---
+
+### 🔑 Important Rule for Verilog (reg vs wire)
+
+1. **Don’t confuse `reg` and `wire`:**
+
+   * When you connect outputs of submodules (like `t[3:0]` in a 16x1 mux made from 4x1 muxes), always declare them as **`wire`** in the higher-level module.
+   * Example:
+
+     ```verilog
+     wire [3:0] t;  // ✅ Correct
+     ```
+
+2. **If an output is `reg`, declare it only inside the module, not outside:**
+
+   * In the submodule (like your 4x1 mux), if the output is driven by an `always` block, then **declare it as `reg` inside that module only**.
+   * Example:
+
+     ```verilog
+     module mux4to1 (input [3:0] in, input [1:0] sel, output reg out);
+         always @(*) begin
+             case(sel)
+                 2'b00: out = in[0];
+                 2'b01: out = in[1];
+                 2'b10: out = in[2];
+                 2'b11: out = in[3];
+             endcase
+         end
+     endmodule
+     ```
+
+3. **At the higher level, always connect to `wire`:**
+
+   * Even if the submodule has `output reg`, at the top module you still connect it to a `wire`.
+   * Example:
+
+     ```verilog
+     wire [3:0] t;   // used for interconnection
+
+     mux4to1 M0(in[3:0], sel[1:0], t[0]);
+     mux4to1 M1(in[7:4], sel[1:0], t[1]);
+     mux4to1 M2(in[11:8], sel[1:0], t[2]);
+     mux4to1 M3(in[15:12], sel[1:0], t[3]);
+
+     mux4to1 M4(t, sel[3:2], out);
+     ```
+
+---
+
+👉 In short:
+
+* **Inside module** → use `reg` if driven in `always`.
+* **Between modules (connections)** → always use `wire`.
+
