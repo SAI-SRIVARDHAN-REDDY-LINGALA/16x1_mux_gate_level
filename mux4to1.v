@@ -20,4 +20,21 @@ module mux4to1 (
  mux2to1 M1 (.din(din[3:2]),.sel(sel[0]),.out(t[1]));
  mux2to1 M2 (.din(t[1:0]),.sel(sel[1]),.out(out));
 
+
+ // udp 
+
+  input s0, s1, i0, i1, i2, i3;
+ output f;
+ table
+        // s0 s1 i0 i1 i2 i3 : f
+        0 0 0 ? ? ? : 0;
+        0 0 1 ? ? ? : 1;
+        1 0 ? 0 ? ? : 0;
+        1 0 ? 1 ? ? : 1;
+        0 1 ? ? 0 ? : 0;
+        0 1 ? ? 1 ? : 1;
+        1 1 ? ? ? 0 : 0;
+        1 1 ? ? ? 1 : 1;
+ endtable
+
 endmodule
